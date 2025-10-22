@@ -75,6 +75,8 @@ jobs:
     env:
       SONAR_PROJECT_KEY: devops-lab
       SONAR_PROJECT_NAME: DevOps Lab Project
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_HOST_URL: http://localhost:9000
     steps:
       - name: Checkout
         uses: actions/checkout@v4
