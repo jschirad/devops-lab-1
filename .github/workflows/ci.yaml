@@ -81,6 +81,11 @@ jobs:
         with:
           clean: true
 
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: http://localhost:9000
+          
       - name: Run pysonar in Docker container
         run: |
           # Run pysonar using Python Docker container
