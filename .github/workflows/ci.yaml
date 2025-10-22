@@ -112,8 +112,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          clean: true
 
       - name: Download coverage reports
         uses: actions/download-artifact@v4
@@ -124,6 +122,7 @@ jobs:
       - name: List coverage report files
         run: |
             echo "📂 Listing downloaded coverage report files:"
+            ls -las
             ls -R coverage-reports
 
       - name: Run SonarQube Scan with Coverage
