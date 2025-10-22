@@ -93,7 +93,7 @@ jobs:
               pip install pysonar && \
               pysonar \
                 --sonar-host-url=http://localhost:9000 \
-                --sonar-token=${{ secrets.SONARQUBE_TOKEN }} \
+                --sonar-token=${{ secrets.SONAR_TOKEN }} \
                 --sonar-project-key=devops-lab-1
             "
 
