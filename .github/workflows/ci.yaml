@@ -42,7 +42,7 @@ jobs:
             ./scripts/check_pylint_score.sh 8.0
 
   test:
-    name: Run Tests
+    name: Run Tests with Coverage
     runs-on: ubuntu-latest
     needs: lint
     steps:
@@ -62,18 +62,50 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run tests
+      - name: Run tests with coverage
         run: |
-          echo "Running unit tests..."
-          python -m pytest test_app.py -v --tb=short
-          echo "✅ All tests passed!"
+          echo "🧪 Running unit tests with coverage analysis..."
+          pytest test_app.py -v --cov=app --cov-report=term --cov-report=xml --cov-report=html
+          echo "✅ Tests completed with coverage analysis!"
+
+      - name: Check coverage threshold
+        run: |
+          chmod +x scripts/check_coverage_threshold.sh
+          ./scripts/check_coverage_threshold.sh 75
+
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-reports
+          path: |
+            coverage.xml
+            htmlcov/
+          retention-days: 30
+
+      - name: Display coverage summary
+        run: |
+          echo "📊 Coverage Summary:"
+          echo "==================="
+          python -c "
+          import xml.etree.ElementTree as ET
+          try:
+              tree = ET.parse('coverage.xml')
+              root = tree.getroot()
+              line_rate = float(root.attrib.get('line-rate', 0)) * 100
+              branch_rate = float(root.attrib.get('branch-rate', 0)) * 100
+              print(f'Line Coverage: {line_rate:.1f}%')
+              print(f'Branch Coverage: {branch_rate:.1f}%')
+          except:
+              print('Could not parse coverage.xml')
+          "
 
   sonar:
-    name: SonarQube Analysis
+    name: SonarQube Analysis with Coverage
     runs-on: self-hosted
     needs: test
     env:
-      SONAR_PROJECT_KEY: devops-lab
+      SONAR_PROJECT_KEY: devops-lab-1
       SONAR_PROJECT_NAME: DevOps Lab Project
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       SONAR_HOST_URL: http://localhost:9000
@@ -83,7 +115,8 @@ jobs:
         with:
           clean: true
 
-      - uses: SonarSource/sonarqube-scan-action@v6
+      - name: Run SonarQube Scan with Coverage
+        uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: http://localhost:9000
@@ -92,6 +125,15 @@ jobs:
         run: |
           chmod +x scripts/check_sonar_quality_gate.sh
           ./scripts/check_sonar_quality_gate.sh devops-lab-1 180
+
+      - name: Display SonarQube metrics
+        if: always()
+        run: |
+          echo "🎯 SonarQube Analysis Complete!"
+          echo "================================"
+          echo "📊 Check your SonarQube dashboard at: $SONAR_HOST_URL"
+          echo "🔍 Project: $SONAR_PROJECT_KEY"
+          echo "📈 Coverage data has been integrated with code quality metrics"
 
   build-and-scan:
     name: Build & Scan Image
