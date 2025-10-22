@@ -111,12 +111,33 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: test-app:latest
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: 'table'
+          output: 'trivy-results.txt'
           severity: 'CRITICAL,HIGH'
 
-      - name: Upload Trivy SARIF to GitHub
+      - name: Display Trivy scan results
         if: always()
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'trivy-results.sarif'
+        run: |
+          echo "🔍 Security Scan Results for test-app:latest"
+          echo "============================================="
+          if [ -f trivy-results.txt ]; then
+            cat trivy-results.txt
+            
+            # Count vulnerabilities
+            CRITICAL=$(grep -c "CRITICAL" trivy-results.txt || echo "0")
+            HIGH=$(grep -c "HIGH" trivy-results.txt || echo "0")
+            
+            echo ""
+            echo "📊 Summary:"
+            echo "  🔴 Critical: $CRITICAL"
+            echo "  🟠 High: $HIGH"
+            
+            if [ "$CRITICAL" -gt 0 ] || [ "$HIGH" -gt 0 ]; then
+              echo "⚠️  Security vulnerabilities detected!"
+              echo "🔧 Consider updating base images or dependencies"
+            else
+              echo "✅ No critical or high severity vulnerabilities found!"
+            fi
+          else
+            echo "❌ Trivy scan results not found"
+          fi
