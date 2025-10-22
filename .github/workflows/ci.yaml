@@ -118,13 +118,6 @@ jobs:
         with:
           name: coverage-reports
 
-    ## ls to identify issues with downloaded files
-      - name: List coverage report files
-        run: |
-            echo "📂 Listing downloaded coverage report files:"
-            ls -las
-            ls -R coverage-reports
-
       - name: Run SonarQube Scan with Coverage
         uses: SonarSource/sonarqube-scan-action@v6
         env:
