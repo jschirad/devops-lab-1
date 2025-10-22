@@ -8,7 +8,7 @@ on:
 jobs:
   lint:
     name: Lint Code
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +33,7 @@ jobs:
 
   test:
     name: Run Tests
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
     needs: lint
     steps:
       - name: Checkout
@@ -59,7 +59,7 @@ jobs:
 
   sonar:
     name: SonarQube Analysis
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
     needs: test
     env:
       SONAR_PROJECT_KEY: devops-lab
@@ -97,7 +97,7 @@ jobs:
 
   build-and-scan:
     name: Build & Scan Image
-    runs-on: [self-hosted, ubuntu-latest]
+    runs-on: self-hosted
     needs: sonar
     steps:
       - name: Checkout
