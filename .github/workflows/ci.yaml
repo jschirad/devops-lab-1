@@ -15,10 +15,18 @@ jobs:
         with:
           clean: true
 
+      - name: Prepare Python cache directory
+        run: |
+          mkdir -p ${{ github.workspace }}/.tools
+          chmod 755 ${{ github.workspace }}/.tools
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-            python-version: '3.11'
+          python-version: '3.11'
+          cache-dependency-path: requirements.txt
+        env:
+          AGENT_TOOLSDIRECTORY: ${{ github.workspace }}/.tools
 
       - name: Create virtual environment
         run: |
@@ -48,10 +56,18 @@ jobs:
         with:
           clean: true
 
+      - name: Prepare Python cache directory
+        run: |
+          mkdir -p ${{ github.workspace }}/.tools
+          chmod 755 ${{ github.workspace }}/.tools
+
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache-dependency-path: requirements.txt
+        env:
+          AGENT_TOOLSDIRECTORY: ${{ github.workspace }}/.tools
 
       - name: Install dependencies
         run: |
