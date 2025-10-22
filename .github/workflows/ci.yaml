@@ -81,16 +81,21 @@ jobs:
         with:
           clean: true
 
-      - name: Install pysonar and run analysis
+      - name: Run pysonar in Docker container
         run: |
-          # Install pysonar
-          pip install pysonar
-          
-          # Run SonarQube analysis using pysonar
-          pysonar \
-            --sonar-host-url=http://localhost:9000 \
-            --sonar-token=${{ secrets.SONARQUBE_TOKEN }} \
-            --sonar-project-key=devops-lab-1
+          # Run pysonar using Python Docker container
+          docker run --rm \
+            --network host \
+            -v "${{ github.workspace }}:/workspace" \
+            -w /workspace \
+            python:3.11-slim \
+            bash -c "
+              pip install pysonar && \
+              pysonar \
+                --sonar-host-url=http://localhost:9000 \
+                --sonar-token=${{ secrets.SONARQUBE_TOKEN }} \
+                --sonar-project-key=devops-lab-1
+            "
 
       - name: Wait & check SonarQube quality gate
         run: |
