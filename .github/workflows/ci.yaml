@@ -119,7 +119,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: coverage-reports
-          path: coverage.xml, htmlcov/
+
+      - name: Verify coverage files
+        run: |
+          echo "📋 Checking downloaded coverage files:"
+          mv coverage-reports/coverage.xml .
+          mv coverage-reports/htmlcov ./htmlcov
+          ls -la coverage.xml || echo "❌ coverage.xml not found"
+          ls -la htmlcov/ || echo "❌ htmlcov/ not found"
+          if [ -f coverage.xml ]; then
+            echo "✅ coverage.xml found, size: $(wc -c < coverage.xml) bytes"
+            head -5 coverage.xml
+          fi
 
       - name: Run SonarQube Scan with Coverage
         uses: SonarSource/sonarqube-scan-action@v6
